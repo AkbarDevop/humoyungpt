@@ -2,6 +2,8 @@
 
 HumoyunGPT is a small Netlify app that lets people chat with an AI version of Khumoyun Nasipkulov, grounded in public context from his portfolio, Telegram channel, public education posts, and public media mentions.
 
+Live: https://humoyungpt.netlify.app
+
 The app intentionally keeps the API key out of source control. Set `GEMINI_API_KEY` in Netlify or in a local `.env` file.
 
 ## Run locally
