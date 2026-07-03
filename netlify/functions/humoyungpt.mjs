@@ -44,7 +44,9 @@ advice style:
 
 privacy and accuracy:
 - only use public information from the context. do not invent private details, phone numbers, home address, family specifics, exact finances, grades beyond public source text, or private relationships.
-- public links are okay: humoyun.com, t.me/humoyun_com, t.me/naseeb_edu, linkedin.com/in/khumoyun-nasipkulov, and public email knasipkulov@connect.ust.hk.
+- public links are okay: https://www.humoyun.com/, https://t.me/humoyun_com, https://t.me/naseeb_edu, https://www.linkedin.com/in/khumoyun-nasipkulov, and public email knasipkulov@connect.ust.hk.
+- do not invent telegram handles such as admin accounts. if someone asks how to reach out, give only the public links above.
+- retrieved context is private grounding, not a citation list. never mention bracket source numbers like [1], [2], "posts [2]", or "context [3]". if the user asks for sources, cite source names with direct public urls.
 - if you do not know, say you do not know from public context.`;
 
 const CHUNKS = Array.isArray(CORPUS?.chunks) ? CORPUS.chunks : [];
@@ -231,12 +233,13 @@ export default async (req) => {
   const notes = await retrieve(lastUser, apiKey);
   let systemText = SYSTEM_PROMPT;
   if (notes.length) {
-    systemText += "\n\npublic context relevant to this question:\n" +
+    systemText += "\n\nprivate public-context notes relevant to this question:\n" +
       notes.map((note, index) => {
-        const where = note.url ? `${note.source}: ${note.url}` : note.source;
-        return `[${index + 1}] ${where}\n${note.text}`;
+        const title = note.source || `source ${index + 1}`;
+        const url = note.url ? `\nsource_url: ${note.url}` : "";
+        return `source_name: ${title}${url}\ntext: ${note.text}`;
       }).join("\n\n") +
-      "\n\nuse this context naturally. do not say 'according to the context' unless the user asks for sources.";
+      "\n\nuse these notes naturally. do not reveal note order, bracket numbers, or internal retrieval labels. do not say 'according to the context' unless the user asks for sources.";
   }
 
   let upstream;

@@ -224,6 +224,18 @@
     border-bottom: 1px solid var(--accent);
   }
 
+  .msg.bot .bubble strong {
+    font-weight: 650;
+  }
+
+  .msg.bot .bubble code {
+    padding: 1px 4px;
+    border-radius: 4px;
+    background: color-mix(in srgb, var(--card) 78%, var(--fg));
+    font-family: var(--mono);
+    font-size: .92em;
+  }
+
   .cursor {
     display: inline-block;
     width: 7px;
@@ -480,26 +492,47 @@
     return clean.replace(/\/$/, "");
   }
 
-  const combined = /\[([^\]]+)\]\((https?:\/\/[^\s)]+|mailto:[^\s)]+)\)|(https?:\/\/[^\s<),]+)|([a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,})|((?:[a-z0-9-]+\.)+(?:com|one|me|ai|app|org|io|dev|net|xyz|uz)(?:\/[^\s<),]*)?)/gi;
+  const combined = /\[([^\]]+)\]\((https?:\/\/[^\s)]+|mailto:[^\s)]+)\)|(https?:\/\/[^\s<),]+)|([a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,})|(@[a-z0-9_]{3,32})|((?:[a-z0-9-]+\.)+(?:com|one|me|ai|app|org|io|dev|net|xyz|uz)(?:\/[^\s<),]*)?)/gi;
+
+  function safeHref(href) {
+    return href.replace(/"/g, "%22");
+  }
+
+  function cleanModelText(text) {
+    return String(text || "")
+      .replace(/\s*\[(?:\d+(?:\s*,\s*\d+)*)\]/g, "")
+      .replace(/\s*\[(?:source|post|context)\s+\d+\]/gi, "");
+  }
 
   function renderText(text) {
-    let html = escapeHtml(text);
+    let html = escapeHtml(cleanModelText(text));
     html = html.replace(/\s*[—–]\s*/g, ", ");
-    html = html.replace(combined, (match, mdLabel, mdUrl, url, email, domain) => {
-      if (mdUrl) return `<a href="${mdUrl}" target="_blank" rel="noopener">${mdLabel}</a>`;
+    html = html.replace(combined, (match, mdLabel, mdUrl, url, email, handle, domain) => {
+      if (mdUrl) {
+        const textLabel = /^https?:\/\//i.test(mdLabel) ? label(mdUrl) : mdLabel;
+        return `<a href="${safeHref(mdUrl)}" target="_blank" rel="noopener">${textLabel}</a>`;
+      }
       if (url) {
         const trailing = url.match(/[.,!?;:]+$/);
         const clean = trailing ? url.slice(0, -trailing[0].length) : url;
-        return `<a href="${clean}" target="_blank" rel="noopener">${label(clean)}</a>${trailing ? trailing[0] : ""}`;
+        return `<a href="${safeHref(clean)}" target="_blank" rel="noopener">${label(clean)}</a>${trailing ? trailing[0] : ""}`;
       }
       if (email) return `<a href="mailto:${email}">${email}</a>`;
+      if (handle) {
+        const name = handle.slice(1);
+        return `<a href="https://t.me/${name}" target="_blank" rel="noopener">${handle}</a>`;
+      }
       if (domain) {
         const trailing = domain.match(/[.,!?;:]+$/);
         const clean = trailing ? domain.slice(0, -trailing[0].length) : domain;
-        return `<a href="https://${clean}" target="_blank" rel="noopener">${label(clean)}</a>${trailing ? trailing[0] : ""}`;
+        return `<a href="https://${safeHref(clean)}" target="_blank" rel="noopener">${label(clean)}</a>${trailing ? trailing[0] : ""}`;
       }
       return match;
     });
+    html = html
+      .replace(/(^|\n)\s*[*-]\s+/g, "$1• ")
+      .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+      .replace(/`([^`]+)`/g, "<code>$1</code>");
     return html;
   }
 
