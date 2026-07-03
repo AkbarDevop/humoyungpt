@@ -3,77 +3,75 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>HumoyunGPT</title>
-<meta name="description" content="Chat with an AI version of Khumoyun Nasipkulov, grounded in his public writing, portfolio, and education work.">
+<title>humoyungpt · chat with humoyun</title>
+<meta name="description" content="chat with an ai version of khumoyun nasipkulov, grounded in his public writing, portfolio, and education work.">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<meta name="theme-color" content="#f8f5ef">
-<meta property="og:title" content="HumoyunGPT">
-<meta property="og:description" content="An AI version of Khumoyun Nasipkulov, built from public context.">
+<meta name="theme-color" content="#f5f1e9" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111722" media="(prefers-color-scheme: dark)">
+<meta property="og:title" content="humoyungpt · chat with humoyun">
+<meta property="og:description" content="chat with an ai version of humoyun, built from public context.">
 <meta property="og:type" content="website">
-<meta property="og:image" content="/assets/hero-bg.jpg">
+<meta property="og:image" content="/assets/profile.jpg">
 <style>
   :root {
-    --bg: #f8f5ef;
-    --fg: #191714;
-    --muted: #6b665c;
-    --line: #ded7ca;
-    --soft: #eee8dc;
-    --panel: #fffdfa;
-    --accent: #0f6b5f;
-    --accent-2: #c74836;
-    --shadow: 0 24px 80px rgba(25, 23, 20, .10);
-    --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    --bg: #f5f1e9;
+    --fg: #26303d;
+    --muted: #6f7480;
+    --line: #ddd2c1;
+    --card: #ece4d6;
+    --accent: #c69433;
+    --accent-ink: #26303d;
+    --link: #8d6827;
+    --sans: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
     --serif: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
     --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
   }
 
   :root[data-theme="dark"] {
-    --bg: #111412;
-    --fg: #f0eee8;
-    --muted: #aaa398;
-    --line: #30362f;
-    --soft: #1b211d;
-    --panel: #171b18;
-    --accent: #61c7b7;
-    --accent-2: #e06955;
-    --shadow: 0 24px 80px rgba(0, 0, 0, .34);
+    --bg: #111722;
+    --fg: #efe9dd;
+    --muted: #aaa394;
+    --line: #2f3741;
+    --card: #1b2430;
+    --accent: #d6a64b;
+    --accent-ink: #141923;
+    --link: #d6a64b;
   }
 
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme]) {
-      --bg: #111412;
-      --fg: #f0eee8;
-      --muted: #aaa398;
-      --line: #30362f;
-      --soft: #1b211d;
-      --panel: #171b18;
-      --accent: #61c7b7;
-      --accent-2: #e06955;
-      --shadow: 0 24px 80px rgba(0, 0, 0, .34);
+      --bg: #111722;
+      --fg: #efe9dd;
+      --muted: #aaa394;
+      --line: #2f3741;
+      --card: #1b2430;
+      --accent: #d6a64b;
+      --accent-ink: #141923;
+      --link: #d6a64b;
     }
   }
 
   * {
     box-sizing: border-box;
+    margin: 0;
+    padding: 0;
     letter-spacing: 0;
   }
 
   html {
-    min-height: 100%;
     -webkit-font-smoothing: antialiased;
-    scroll-behavior: smooth;
+    min-height: 100%;
   }
 
   body {
-    margin: 0;
     min-height: 100vh;
-    background:
-      linear-gradient(120deg, color-mix(in srgb, var(--accent) 7%, transparent), transparent 36%),
-      linear-gradient(180deg, var(--bg), color-mix(in srgb, var(--soft) 70%, var(--bg)));
+    background: var(--bg);
     color: var(--fg);
     font-family: var(--sans);
-    font-size: 16px;
-    line-height: 1.55;
+    font-size: 17px;
+    line-height: 1.65;
+    padding: 0 24px;
+    transition: background .25s ease, color .25s ease;
   }
 
   a {
@@ -86,267 +84,139 @@
     font: inherit;
   }
 
-  .shell {
-    width: min(1180px, calc(100vw - 32px));
-    min-height: 100svh;
+  .wrap {
+    max-width: 660px;
+    min-height: 100vh;
     margin: 0 auto;
-    display: grid;
-    grid-template-columns: minmax(280px, 380px) minmax(0, 1fr);
-    gap: 28px;
-    padding: 28px 0;
-  }
-
-  .identity {
-    position: sticky;
-    top: 28px;
-    height: calc(100svh - 56px);
-    display: grid;
-    grid-template-rows: minmax(220px, 1fr) auto;
-    overflow: hidden;
-    border: 1px solid var(--line);
-    background: var(--panel);
-    box-shadow: var(--shadow);
-  }
-
-  .portrait {
-    position: relative;
-    min-height: 0;
-    overflow: hidden;
-  }
-
-  .portrait img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-    filter: saturate(.95) contrast(.98);
-  }
-
-  .portrait::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(180deg, transparent 42%, rgba(0, 0, 0, .52));
-  }
-
-  .identity-text {
-    padding: 22px;
-    border-top: 1px solid var(--line);
-  }
-
-  .eyebrow {
-    margin: 0 0 8px;
-    color: var(--accent);
-    font-family: var(--mono);
-    font-size: 12px;
-  }
-
-  .identity h1 {
-    margin: 0 0 8px;
-    font-family: var(--serif);
-    font-size: clamp(34px, 5vw, 56px);
-    line-height: 1;
-    font-weight: 600;
-  }
-
-  .identity p {
-    margin: 0;
-    color: var(--muted);
-  }
-
-  .facts {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 18px;
-  }
-
-  .fact {
-    min-height: 32px;
-    display: inline-flex;
-    align-items: center;
-    border: 1px solid var(--line);
-    padding: 5px 9px;
-    color: var(--muted);
-    background: color-mix(in srgb, var(--soft) 55%, transparent);
-    font-size: 13px;
-  }
-
-  .chat {
-    min-width: 0;
-    min-height: calc(100svh - 56px);
+    padding: 80px 0 40px;
     display: flex;
     flex-direction: column;
-    border: 1px solid var(--line);
-    background: color-mix(in srgb, var(--panel) 92%, transparent);
-    box-shadow: var(--shadow);
   }
 
-  .bar {
-    min-height: 68px;
+  .topline {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 16px;
-    padding: 16px 18px;
+    gap: 14px;
+  }
+
+  .back {
+    align-self: flex-start;
+    color: var(--muted);
+    border-bottom: 1px solid var(--line);
+    font-family: var(--mono);
+    font-size: 13px;
+  }
+
+  .back:hover,
+  .back:focus-visible {
+    color: var(--accent);
+    border-color: var(--accent);
+    outline: none;
+  }
+
+  .public-links {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 12px;
+    white-space: nowrap;
+  }
+
+  .public-links a {
     border-bottom: 1px solid var(--line);
   }
 
-  .title {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    min-width: 0;
-  }
-
-  .mark {
-    width: 38px;
-    height: 38px;
-    flex: 0 0 auto;
-    display: grid;
-    place-items: center;
-    border: 1px solid var(--line);
-    background: var(--soft);
-    color: var(--accent);
-    font-family: var(--serif);
-    font-size: 22px;
-  }
-
-  .title h2 {
-    margin: 0;
-    font-size: 17px;
-    line-height: 1.2;
-    font-weight: 650;
-  }
-
-  .title p {
-    margin: 2px 0 0;
-    color: var(--muted);
-    font-size: 13px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .links {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex: 0 0 auto;
-  }
-
-  .icon-btn {
-    width: 38px;
-    height: 38px;
-    border: 1px solid var(--line);
-    background: transparent;
-    color: var(--muted);
-    display: grid;
-    place-items: center;
-    cursor: pointer;
-    transition: color .18s ease, border-color .18s ease, transform .18s ease, background .18s ease;
-  }
-
-  .icon-btn:hover,
-  .icon-btn:focus-visible {
+  .public-links a:hover,
+  .public-links a:focus-visible {
     color: var(--accent);
     border-color: var(--accent);
-    background: color-mix(in srgb, var(--accent) 8%, transparent);
-    transform: translateY(-1px);
     outline: none;
   }
 
-  .log {
-    flex: 1;
-    min-height: 320px;
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
-    padding: 24px 24px 8px;
-    overflow: auto;
-  }
-
-  .welcome {
-    display: grid;
-    gap: 10px;
-    margin: auto 0;
-    max-width: 700px;
-    animation: rise .42s ease both;
-  }
-
-  .welcome h3 {
-    margin: 0;
+  h1 {
+    margin: 26px 0 8px;
     font-family: var(--serif);
-    font-size: clamp(30px, 5vw, 54px);
-    line-height: 1.02;
+    font-size: 31px;
+    line-height: 1.1;
     font-weight: 600;
   }
 
-  .welcome p {
-    margin: 0;
+  .sub {
     max-width: 58ch;
+    margin-bottom: 26px;
     color: var(--muted);
+    font-size: 15px;
+    line-height: 1.5;
   }
 
-  .chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 10px;
-  }
-
-  .chip {
-    min-height: 36px;
+  #theme {
+    position: fixed;
+    top: 22px;
+    right: 22px;
+    width: 38px;
+    height: 38px;
     border: 1px solid var(--line);
-    background: transparent;
+    border-radius: 50%;
+    background: var(--card);
     color: var(--muted);
-    padding: 7px 11px;
     cursor: pointer;
-    transition: color .18s ease, border-color .18s ease, transform .18s ease, background .18s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    transition: transform .18s ease, border-color .18s ease, color .18s ease;
   }
 
-  .chip:hover,
-  .chip:focus-visible {
+  #theme:hover,
+  #theme:focus-visible {
     color: var(--accent);
     border-color: var(--accent);
-    background: color-mix(in srgb, var(--accent) 7%, transparent);
-    transform: translateY(-1px);
+    transform: rotate(20deg);
     outline: none;
   }
 
+  #log {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    margin-bottom: 20px;
+  }
+
   .msg {
-    width: min(92%, 720px);
-    animation: rise .26s ease both;
+    max-width: 90%;
+    line-height: 1.6;
+    animation: rise .2s ease both;
+  }
+
+  .msg .who {
+    margin-bottom: 5px;
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
   }
 
   .msg.you {
     align-self: flex-end;
-  }
-
-  .who {
-    color: var(--muted);
-    font-family: var(--mono);
-    font-size: 12px;
-    margin-bottom: 6px;
-  }
-
-  .msg.you .who {
     text-align: right;
   }
 
-  .bubble {
-    white-space: pre-wrap;
-  }
-
   .msg.you .bubble {
+    display: inline-block;
+    padding: 9px 14px;
     border: 1px solid var(--line);
-    background: var(--soft);
-    padding: 10px 13px;
+    border-radius: 12px 12px 4px 12px;
+    background: var(--card);
+    text-align: left;
   }
 
   .msg.bot .bubble {
-    padding: 1px 0;
-    color: var(--fg);
+    white-space: pre-wrap;
   }
 
   .msg.bot .bubble a {
@@ -357,223 +227,178 @@
   .cursor {
     display: inline-block;
     width: 7px;
-    height: 16px;
-    margin-left: 2px;
+    height: 15px;
+    margin-left: 1px;
     vertical-align: text-bottom;
-    background: var(--accent-2);
-    animation: blink 1s steps(1) infinite;
+    background: var(--accent);
+    animation: blink 1s step-end infinite;
   }
 
-  .composer {
-    position: relative;
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 18px;
+  }
+
+  .chip {
+    padding: 6px 12px;
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    background: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 13px;
+    transition: border-color .15s ease, color .15s ease, transform .15s ease;
+  }
+
+  .chip:hover,
+  .chip:focus-visible {
+    color: var(--accent);
+    border-color: var(--accent);
+    transform: translateY(-1px);
+    outline: none;
+  }
+
+  form {
+    position: sticky;
+    bottom: 0;
+    display: flex;
+    align-items: flex-end;
     gap: 10px;
-    align-items: end;
-    padding: 16px 18px 18px;
-    border-top: 1px solid var(--line);
-    background: color-mix(in srgb, var(--panel) 96%, transparent);
+    padding: 14px 0 24px;
+    background: var(--bg);
   }
 
   textarea {
-    width: 100%;
-    max-height: 150px;
+    flex: 1;
+    max-height: 140px;
+    padding: 11px 14px;
     resize: none;
-    color: var(--fg);
-    background: var(--soft);
-    border: 1px solid var(--line);
-    padding: 11px 13px;
-    outline: none;
     overflow-y: hidden;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--card);
+    color: var(--fg);
+    outline: none;
+    font-size: 16px;
+    line-height: 1.5;
   }
 
   textarea:focus {
     border-color: var(--accent);
   }
 
-  .send {
-    min-width: 76px;
-    height: 48px;
-    border: 1px solid var(--accent);
+  button.send {
+    padding: 11px 18px;
+    border: none;
+    border-radius: 12px;
     background: var(--accent);
-    color: #fffdfa;
+    color: var(--accent-ink);
     cursor: pointer;
-    transition: opacity .18s ease, transform .18s ease;
+    font-size: 15px;
+    font-weight: 600;
+    transition: opacity .15s ease, transform .15s ease;
   }
 
-  .send:hover,
-  .send:focus-visible {
+  button.send:hover,
+  button.send:focus-visible {
     transform: translateY(-1px);
     outline: none;
   }
 
-  .send:disabled {
+  button.send:disabled {
     opacity: .45;
     cursor: default;
     transform: none;
   }
 
-  .notice {
-    padding: 0 18px 14px;
+  .foot {
+    padding-bottom: 20px;
     color: var(--muted);
+    text-align: center;
     font-family: var(--mono);
     font-size: 11px;
   }
 
-  @keyframes rise {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
+  .foot a {
+    border-bottom: 1px solid var(--link);
   }
 
   @keyframes blink {
     50% { opacity: 0; }
   }
 
-  @media (max-width: 880px) {
-    .shell {
-      width: min(100vw - 24px, 720px);
-      grid-template-columns: 1fr;
-      gap: 14px;
-      padding: 12px 0;
-    }
-
-    .identity {
-      position: relative;
-      top: auto;
-      height: auto;
-      grid-template-columns: 116px minmax(0, 1fr);
-      grid-template-rows: auto;
-    }
-
-    .portrait {
-      min-height: 180px;
-    }
-
-    .portrait img {
-      object-position: 54% 35%;
-    }
-
-    .portrait::after {
-      display: none;
-    }
-
-    .identity-text {
-      border-top: 0;
-      border-left: 1px solid var(--line);
-      padding: 16px;
-    }
-
-    .identity h1 {
-      font-size: clamp(30px, 9vw, 42px);
-    }
-
-    .facts {
-      gap: 6px;
-      margin-top: 12px;
-    }
-
-    .fact {
-      min-height: 28px;
-      font-size: 12px;
-      padding: 4px 7px;
-    }
-
-    .chat {
-      min-height: calc(100svh - 220px);
-    }
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 
   @media (max-width: 560px) {
-    .bar {
+    body {
+      padding: 0 18px;
+    }
+
+    .wrap {
+      padding: 52px 0 20px;
+    }
+
+    .topline {
       align-items: flex-start;
-      padding: 14px;
     }
 
-    .links {
-      gap: 6px;
+    .public-links {
+      gap: 8px;
+      white-space: normal;
+      justify-content: flex-end;
+      text-align: right;
     }
 
-    .icon-btn,
-    .mark {
+    #theme {
+      top: 14px;
+      right: 14px;
       width: 34px;
       height: 34px;
     }
 
-    .title p {
-      white-space: normal;
-    }
-
-    .log {
-      padding: 18px 14px 6px;
-      min-height: 360px;
+    h1 {
+      font-size: 29px;
     }
 
     .msg {
-      width: 100%;
+      max-width: 100%;
     }
 
-    .composer {
-      grid-template-columns: 1fr;
-      padding: 12px 14px 14px;
-    }
-
-    .send {
-      width: 100%;
+    form {
+      padding-bottom: 18px;
     }
   }
 </style>
 </head>
 <body>
-<main class="shell">
-  <aside class="identity" aria-label="Humoyun profile">
-    <div class="portrait">
-      <img src="/assets/hero-bg.jpg" alt="Khumoyun Nasipkulov at HKUST">
+<button id="theme" aria-label="toggle theme">☾</button>
+<div class="wrap">
+  <div class="topline">
+    <a class="back" href="https://www.humoyun.com/" target="_blank" rel="noopener">khumoyun nasipkulov</a>
+    <div class="public-links" aria-label="public links">
+      <a href="https://t.me/humoyun_com" target="_blank" rel="noopener">telegram</a>
+      <a href="https://t.me/naseeb_edu" target="_blank" rel="noopener">naseeb</a>
+      <a href="https://www.linkedin.com/in/khumoyun-nasipkulov" target="_blank" rel="noopener">linkedin</a>
     </div>
-    <div class="identity-text">
-      <p class="eyebrow">humoyungpt</p>
-      <h1>Khumoyun Nasipkulov</h1>
-      <p>Math and Economics at HKUST, founder of NASEEB EDU, mentor for students chasing scholarships and bigger rooms.</p>
-      <div class="facts" aria-label="profile facts">
-        <span class="fact">HKUST</span>
-        <span class="fact">NASEEB EDU</span>
-        <span class="fact">Uzbekistan</span>
-        <span class="fact">Hong Kong</span>
-      </div>
-    </div>
-  </aside>
+  </div>
 
-  <section class="chat" aria-label="HumoyunGPT chat">
-    <header class="bar">
-      <div class="title">
-        <div class="mark" aria-hidden="true">h</div>
-        <div>
-          <h2>HumoyunGPT</h2>
-          <p>public-context AI, not the real Humoyun</p>
-        </div>
-      </div>
-      <nav class="links" aria-label="public links">
-        <a class="icon-btn" href="https://www.humoyun.com/" target="_blank" rel="noopener" aria-label="Humoyun website" title="website">w</a>
-        <a class="icon-btn" href="https://t.me/humoyun_com" target="_blank" rel="noopener" aria-label="Telegram channel" title="telegram">t</a>
-        <a class="icon-btn" href="https://www.linkedin.com/in/khumoyun-nasipkulov" target="_blank" rel="noopener" aria-label="LinkedIn" title="linkedin">in</a>
-        <button class="icon-btn" id="theme" type="button" aria-label="toggle theme" title="theme">☾</button>
-      </nav>
-    </header>
+  <h1>humoyungpt</h1>
+  <p class="sub">an ai version of humoyun, grounded in his public portfolio, telegram posts, and education work. ask about hkust, scholarships, hong kong, math, or naseeb edu.</p>
 
-    <div class="log" id="log">
-      <div class="welcome" id="welcome">
-        <h3>Ask about scholarships, HKUST, Hong Kong, math, or building a life abroad.</h3>
-        <p>The answers are grounded in public portfolio details, Telegram posts, and public media mentions.</p>
-        <div class="chips" id="chips"></div>
-      </div>
-    </div>
+  <div class="chips" id="chips"></div>
+  <div id="log"></div>
 
-    <form class="composer" id="form">
-      <textarea id="input" rows="1" placeholder="Ask Humoyun something..." autocomplete="off"></textarea>
-      <button class="send" id="send" type="submit">send</button>
-    </form>
-    <div class="notice">AI can be wrong. For anything important, message the real Humoyun.</div>
-  </section>
-</main>
+  <form id="form">
+    <textarea id="input" rows="1" placeholder="ask humoyun something..." autocomplete="off"></textarea>
+    <button class="send" id="send" type="submit">send</button>
+  </form>
+  <div class="foot">humoyungpt can get things wrong. the real humoyun is on <a href="https://t.me/humoyun_com" target="_blank" rel="noopener">telegram</a>.</div>
+</div>
 
 <script>
   const root = document.documentElement;
@@ -601,20 +426,19 @@
   const input = document.getElementById("input");
   const send = document.getElementById("send");
   const chips = document.getElementById("chips");
-  const welcome = document.getElementById("welcome");
   const history = [];
   let busy = false;
 
   const prompts = [
-    "how did you get to HKUST?",
-    "what is NASEEB EDU?",
+    "how did you get to hkust?",
+    "what is naseeb edu?",
     "give me advice for scholarships",
-    "why is Hong Kong special for you?",
-    "how should I prepare for SAT math?",
-    "what should Uzbek students do earlier?",
-    "what did you learn from Disney?",
+    "why is hong kong special for you?",
+    "how should i prepare for sat math?",
+    "what should uzbek students do earlier?",
+    "what did you learn from disney?",
     "how do meaningful connections help?",
-    "nima uchun HKUST?",
+    "nima uchun hkust?",
     "grant olish uchun nimadan boshlay?"
   ];
 
@@ -629,7 +453,7 @@
 
   function renderChips() {
     chips.innerHTML = "";
-    for (const text of shuffle(prompts).slice(0, 4)) {
+    for (const text of shuffle(prompts).slice(0, 3)) {
       const button = document.createElement("button");
       button.className = "chip";
       button.type = "button";
@@ -646,7 +470,7 @@
       .replace(/>/g, "&gt;");
   }
 
-  function linkLabel(url) {
+  function label(url) {
     const clean = url.replace(/^https?:\/\//, "").replace(/^www\./, "");
     if (clean.includes("linkedin.com")) return "linkedin";
     if (clean.includes("t.me/humoyun_com")) return "telegram";
@@ -656,41 +480,53 @@
     return clean.replace(/\/$/, "");
   }
 
+  const combined = /\[([^\]]+)\]\((https?:\/\/[^\s)]+|mailto:[^\s)]+)\)|(https?:\/\/[^\s<),]+)|([a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,})|((?:[a-z0-9-]+\.)+(?:com|one|me|ai|app|org|io|dev|net|xyz|uz)(?:\/[^\s<),]*)?)/gi;
+
   function renderText(text) {
     let html = escapeHtml(text);
-    html = html.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+|mailto:[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
-    html = html.replace(/(https?:\/\/[^\s<),]+)/g, (match) => {
-      const trailing = match.match(/[.,!?;:]+$/);
-      const clean = trailing ? match.slice(0, -trailing[0].length) : match;
-      return `<a href="${clean}" target="_blank" rel="noopener">${linkLabel(clean)}</a>${trailing ? trailing[0] : ""}`;
+    html = html.replace(/\s*[—–]\s*/g, ", ");
+    html = html.replace(combined, (match, mdLabel, mdUrl, url, email, domain) => {
+      if (mdUrl) return `<a href="${mdUrl}" target="_blank" rel="noopener">${mdLabel}</a>`;
+      if (url) {
+        const trailing = url.match(/[.,!?;:]+$/);
+        const clean = trailing ? url.slice(0, -trailing[0].length) : url;
+        return `<a href="${clean}" target="_blank" rel="noopener">${label(clean)}</a>${trailing ? trailing[0] : ""}`;
+      }
+      if (email) return `<a href="mailto:${email}">${email}</a>`;
+      if (domain) {
+        const trailing = domain.match(/[.,!?;:]+$/);
+        const clean = trailing ? domain.slice(0, -trailing[0].length) : domain;
+        return `<a href="https://${clean}" target="_blank" rel="noopener">${label(clean)}</a>${trailing ? trailing[0] : ""}`;
+      }
+      return match;
     });
-    html = html.replace(/([a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,})/gi, '<a href="mailto:$1">$1</a>');
     return html;
   }
 
   function nearBottom() {
-    return log.scrollTop + log.clientHeight >= log.scrollHeight - 140;
+    return window.innerHeight + window.scrollY >= document.body.scrollHeight - 140;
   }
 
-  function scrollLog() {
-    log.scrollTop = log.scrollHeight;
+  function toBottom(smooth) {
+    window.scrollTo({ top: document.body.scrollHeight, behavior: smooth ? "smooth" : "auto" });
   }
 
-  function addMessage(label, cls, text = "") {
+  function addMessage(labelText, cls, text = "") {
     const message = document.createElement("div");
-    message.className = `msg ${cls}`;
-    message.innerHTML = `<div class="who">${label}</div><div class="bubble"></div>`;
+    message.className = "msg " + cls;
+    message.innerHTML = `<div class="who">${labelText}</div><div class="bubble"></div>`;
     log.appendChild(message);
     const bubble = message.querySelector(".bubble");
     if (text) bubble.textContent = text;
-    scrollLog();
+    toBottom(true);
     return bubble;
   }
 
   function fitInput() {
     input.style.height = "auto";
-    input.style.height = Math.min(input.scrollHeight, 150) + "px";
-    input.style.overflowY = input.scrollHeight > 150 ? "auto" : "hidden";
+    const height = Math.min(input.scrollHeight, 140);
+    input.style.height = height + "px";
+    input.style.overflowY = input.scrollHeight > 140 ? "auto" : "hidden";
   }
 
   input.addEventListener("input", fitInput);
@@ -715,7 +551,7 @@
 
     busy = true;
     send.disabled = true;
-    welcome.style.display = "none";
+    chips.style.display = "none";
     addMessage("you", "you", text);
     history.push({ role: "user", content: text });
     input.value = "";
@@ -751,7 +587,7 @@
         const stick = nearBottom();
         accumulated += decoder.decode(value, { stream: true });
         bubble.innerHTML = renderText(accumulated) + '<span class="cursor"></span>';
-        if (stick) scrollLog();
+        if (stick) toBottom(false);
       }
 
       bubble.innerHTML = renderText(accumulated || "(no response)");
