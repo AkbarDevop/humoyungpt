@@ -1,0 +1,770 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HumoyunGPT</title>
+<meta name="description" content="Chat with an AI version of Khumoyun Nasipkulov, grounded in his public writing, portfolio, and education work.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#f8f5ef">
+<meta property="og:title" content="HumoyunGPT">
+<meta property="og:description" content="An AI version of Khumoyun Nasipkulov, built from public context.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="/assets/hero-bg.jpg">
+<style>
+  :root {
+    --bg: #f8f5ef;
+    --fg: #191714;
+    --muted: #6b665c;
+    --line: #ded7ca;
+    --soft: #eee8dc;
+    --panel: #fffdfa;
+    --accent: #0f6b5f;
+    --accent-2: #c74836;
+    --shadow: 0 24px 80px rgba(25, 23, 20, .10);
+    --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    --serif: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+    --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #111412;
+    --fg: #f0eee8;
+    --muted: #aaa398;
+    --line: #30362f;
+    --soft: #1b211d;
+    --panel: #171b18;
+    --accent: #61c7b7;
+    --accent-2: #e06955;
+    --shadow: 0 24px 80px rgba(0, 0, 0, .34);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme]) {
+      --bg: #111412;
+      --fg: #f0eee8;
+      --muted: #aaa398;
+      --line: #30362f;
+      --soft: #1b211d;
+      --panel: #171b18;
+      --accent: #61c7b7;
+      --accent-2: #e06955;
+      --shadow: 0 24px 80px rgba(0, 0, 0, .34);
+    }
+  }
+
+  * {
+    box-sizing: border-box;
+    letter-spacing: 0;
+  }
+
+  html {
+    min-height: 100%;
+    -webkit-font-smoothing: antialiased;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background:
+      linear-gradient(120deg, color-mix(in srgb, var(--accent) 7%, transparent), transparent 36%),
+      linear-gradient(180deg, var(--bg), color-mix(in srgb, var(--soft) 70%, var(--bg)));
+    color: var(--fg);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.55;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  button,
+  textarea {
+    font: inherit;
+  }
+
+  .shell {
+    width: min(1180px, calc(100vw - 32px));
+    min-height: 100svh;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: minmax(280px, 380px) minmax(0, 1fr);
+    gap: 28px;
+    padding: 28px 0;
+  }
+
+  .identity {
+    position: sticky;
+    top: 28px;
+    height: calc(100svh - 56px);
+    display: grid;
+    grid-template-rows: minmax(220px, 1fr) auto;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    background: var(--panel);
+    box-shadow: var(--shadow);
+  }
+
+  .portrait {
+    position: relative;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .portrait img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    filter: saturate(.95) contrast(.98);
+  }
+
+  .portrait::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 42%, rgba(0, 0, 0, .52));
+  }
+
+  .identity-text {
+    padding: 22px;
+    border-top: 1px solid var(--line);
+  }
+
+  .eyebrow {
+    margin: 0 0 8px;
+    color: var(--accent);
+    font-family: var(--mono);
+    font-size: 12px;
+  }
+
+  .identity h1 {
+    margin: 0 0 8px;
+    font-family: var(--serif);
+    font-size: clamp(34px, 5vw, 56px);
+    line-height: 1;
+    font-weight: 600;
+  }
+
+  .identity p {
+    margin: 0;
+    color: var(--muted);
+  }
+
+  .facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 18px;
+  }
+
+  .fact {
+    min-height: 32px;
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid var(--line);
+    padding: 5px 9px;
+    color: var(--muted);
+    background: color-mix(in srgb, var(--soft) 55%, transparent);
+    font-size: 13px;
+  }
+
+  .chat {
+    min-width: 0;
+    min-height: calc(100svh - 56px);
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--line);
+    background: color-mix(in srgb, var(--panel) 92%, transparent);
+    box-shadow: var(--shadow);
+  }
+
+  .bar {
+    min-height: 68px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 16px 18px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+  }
+
+  .mark {
+    width: 38px;
+    height: 38px;
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--line);
+    background: var(--soft);
+    color: var(--accent);
+    font-family: var(--serif);
+    font-size: 22px;
+  }
+
+  .title h2 {
+    margin: 0;
+    font-size: 17px;
+    line-height: 1.2;
+    font-weight: 650;
+  }
+
+  .title p {
+    margin: 2px 0 0;
+    color: var(--muted);
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .links {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 0 0 auto;
+  }
+
+  .icon-btn {
+    width: 38px;
+    height: 38px;
+    border: 1px solid var(--line);
+    background: transparent;
+    color: var(--muted);
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    transition: color .18s ease, border-color .18s ease, transform .18s ease, background .18s ease;
+  }
+
+  .icon-btn:hover,
+  .icon-btn:focus-visible {
+    color: var(--accent);
+    border-color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 8%, transparent);
+    transform: translateY(-1px);
+    outline: none;
+  }
+
+  .log {
+    flex: 1;
+    min-height: 320px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding: 24px 24px 8px;
+    overflow: auto;
+  }
+
+  .welcome {
+    display: grid;
+    gap: 10px;
+    margin: auto 0;
+    max-width: 700px;
+    animation: rise .42s ease both;
+  }
+
+  .welcome h3 {
+    margin: 0;
+    font-family: var(--serif);
+    font-size: clamp(30px, 5vw, 54px);
+    line-height: 1.02;
+    font-weight: 600;
+  }
+
+  .welcome p {
+    margin: 0;
+    max-width: 58ch;
+    color: var(--muted);
+  }
+
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .chip {
+    min-height: 36px;
+    border: 1px solid var(--line);
+    background: transparent;
+    color: var(--muted);
+    padding: 7px 11px;
+    cursor: pointer;
+    transition: color .18s ease, border-color .18s ease, transform .18s ease, background .18s ease;
+  }
+
+  .chip:hover,
+  .chip:focus-visible {
+    color: var(--accent);
+    border-color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 7%, transparent);
+    transform: translateY(-1px);
+    outline: none;
+  }
+
+  .msg {
+    width: min(92%, 720px);
+    animation: rise .26s ease both;
+  }
+
+  .msg.you {
+    align-self: flex-end;
+  }
+
+  .who {
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 12px;
+    margin-bottom: 6px;
+  }
+
+  .msg.you .who {
+    text-align: right;
+  }
+
+  .bubble {
+    white-space: pre-wrap;
+  }
+
+  .msg.you .bubble {
+    border: 1px solid var(--line);
+    background: var(--soft);
+    padding: 10px 13px;
+  }
+
+  .msg.bot .bubble {
+    padding: 1px 0;
+    color: var(--fg);
+  }
+
+  .msg.bot .bubble a {
+    color: var(--fg);
+    border-bottom: 1px solid var(--accent);
+  }
+
+  .cursor {
+    display: inline-block;
+    width: 7px;
+    height: 16px;
+    margin-left: 2px;
+    vertical-align: text-bottom;
+    background: var(--accent-2);
+    animation: blink 1s steps(1) infinite;
+  }
+
+  .composer {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 10px;
+    align-items: end;
+    padding: 16px 18px 18px;
+    border-top: 1px solid var(--line);
+    background: color-mix(in srgb, var(--panel) 96%, transparent);
+  }
+
+  textarea {
+    width: 100%;
+    max-height: 150px;
+    resize: none;
+    color: var(--fg);
+    background: var(--soft);
+    border: 1px solid var(--line);
+    padding: 11px 13px;
+    outline: none;
+    overflow-y: hidden;
+  }
+
+  textarea:focus {
+    border-color: var(--accent);
+  }
+
+  .send {
+    min-width: 76px;
+    height: 48px;
+    border: 1px solid var(--accent);
+    background: var(--accent);
+    color: #fffdfa;
+    cursor: pointer;
+    transition: opacity .18s ease, transform .18s ease;
+  }
+
+  .send:hover,
+  .send:focus-visible {
+    transform: translateY(-1px);
+    outline: none;
+  }
+
+  .send:disabled {
+    opacity: .45;
+    cursor: default;
+    transform: none;
+  }
+
+  .notice {
+    padding: 0 18px 14px;
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 11px;
+  }
+
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes blink {
+    50% { opacity: 0; }
+  }
+
+  @media (max-width: 880px) {
+    .shell {
+      width: min(100vw - 24px, 720px);
+      grid-template-columns: 1fr;
+      gap: 14px;
+      padding: 12px 0;
+    }
+
+    .identity {
+      position: relative;
+      top: auto;
+      height: auto;
+      grid-template-columns: 116px minmax(0, 1fr);
+      grid-template-rows: auto;
+    }
+
+    .portrait {
+      min-height: 180px;
+    }
+
+    .portrait img {
+      object-position: 54% 35%;
+    }
+
+    .portrait::after {
+      display: none;
+    }
+
+    .identity-text {
+      border-top: 0;
+      border-left: 1px solid var(--line);
+      padding: 16px;
+    }
+
+    .identity h1 {
+      font-size: clamp(30px, 9vw, 42px);
+    }
+
+    .facts {
+      gap: 6px;
+      margin-top: 12px;
+    }
+
+    .fact {
+      min-height: 28px;
+      font-size: 12px;
+      padding: 4px 7px;
+    }
+
+    .chat {
+      min-height: calc(100svh - 220px);
+    }
+  }
+
+  @media (max-width: 560px) {
+    .bar {
+      align-items: flex-start;
+      padding: 14px;
+    }
+
+    .links {
+      gap: 6px;
+    }
+
+    .icon-btn,
+    .mark {
+      width: 34px;
+      height: 34px;
+    }
+
+    .title p {
+      white-space: normal;
+    }
+
+    .log {
+      padding: 18px 14px 6px;
+      min-height: 360px;
+    }
+
+    .msg {
+      width: 100%;
+    }
+
+    .composer {
+      grid-template-columns: 1fr;
+      padding: 12px 14px 14px;
+    }
+
+    .send {
+      width: 100%;
+    }
+  }
+</style>
+</head>
+<body>
+<main class="shell">
+  <aside class="identity" aria-label="Humoyun profile">
+    <div class="portrait">
+      <img src="/assets/hero-bg.jpg" alt="Khumoyun Nasipkulov at HKUST">
+    </div>
+    <div class="identity-text">
+      <p class="eyebrow">humoyungpt</p>
+      <h1>Khumoyun Nasipkulov</h1>
+      <p>Math and Economics at HKUST, founder of NASEEB EDU, mentor for students chasing scholarships and bigger rooms.</p>
+      <div class="facts" aria-label="profile facts">
+        <span class="fact">HKUST</span>
+        <span class="fact">NASEEB EDU</span>
+        <span class="fact">Uzbekistan</span>
+        <span class="fact">Hong Kong</span>
+      </div>
+    </div>
+  </aside>
+
+  <section class="chat" aria-label="HumoyunGPT chat">
+    <header class="bar">
+      <div class="title">
+        <div class="mark" aria-hidden="true">h</div>
+        <div>
+          <h2>HumoyunGPT</h2>
+          <p>public-context AI, not the real Humoyun</p>
+        </div>
+      </div>
+      <nav class="links" aria-label="public links">
+        <a class="icon-btn" href="https://www.humoyun.com/" target="_blank" rel="noopener" aria-label="Humoyun website" title="website">w</a>
+        <a class="icon-btn" href="https://t.me/humoyun_com" target="_blank" rel="noopener" aria-label="Telegram channel" title="telegram">t</a>
+        <a class="icon-btn" href="https://www.linkedin.com/in/khumoyun-nasipkulov" target="_blank" rel="noopener" aria-label="LinkedIn" title="linkedin">in</a>
+        <button class="icon-btn" id="theme" type="button" aria-label="toggle theme" title="theme">☾</button>
+      </nav>
+    </header>
+
+    <div class="log" id="log">
+      <div class="welcome" id="welcome">
+        <h3>Ask about scholarships, HKUST, Hong Kong, math, or building a life abroad.</h3>
+        <p>The answers are grounded in public portfolio details, Telegram posts, and public media mentions.</p>
+        <div class="chips" id="chips"></div>
+      </div>
+    </div>
+
+    <form class="composer" id="form">
+      <textarea id="input" rows="1" placeholder="Ask Humoyun something..." autocomplete="off"></textarea>
+      <button class="send" id="send" type="submit">send</button>
+    </form>
+    <div class="notice">AI can be wrong. For anything important, message the real Humoyun.</div>
+  </section>
+</main>
+
+<script>
+  const root = document.documentElement;
+  const theme = document.getElementById("theme");
+  const savedTheme = localStorage.getItem("theme");
+  if (savedTheme) root.setAttribute("data-theme", savedTheme);
+
+  function syncTheme() {
+    const current = root.getAttribute("data-theme") ||
+      (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    theme.textContent = current === "dark" ? "☀" : "☾";
+  }
+  syncTheme();
+  theme.addEventListener("click", () => {
+    const current = root.getAttribute("data-theme") ||
+      (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    const next = current === "dark" ? "light" : "dark";
+    root.setAttribute("data-theme", next);
+    localStorage.setItem("theme", next);
+    syncTheme();
+  });
+
+  const log = document.getElementById("log");
+  const form = document.getElementById("form");
+  const input = document.getElementById("input");
+  const send = document.getElementById("send");
+  const chips = document.getElementById("chips");
+  const welcome = document.getElementById("welcome");
+  const history = [];
+  let busy = false;
+
+  const prompts = [
+    "how did you get to HKUST?",
+    "what is NASEEB EDU?",
+    "give me advice for scholarships",
+    "why is Hong Kong special for you?",
+    "how should I prepare for SAT math?",
+    "what should Uzbek students do earlier?",
+    "what did you learn from Disney?",
+    "how do meaningful connections help?",
+    "nima uchun HKUST?",
+    "grant olish uchun nimadan boshlay?"
+  ];
+
+  function shuffle(items) {
+    const copy = items.slice();
+    for (let i = copy.length - 1; i > 0; i -= 1) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+    return copy;
+  }
+
+  function renderChips() {
+    chips.innerHTML = "";
+    for (const text of shuffle(prompts).slice(0, 4)) {
+      const button = document.createElement("button");
+      button.className = "chip";
+      button.type = "button";
+      button.textContent = text;
+      chips.appendChild(button);
+    }
+  }
+  renderChips();
+
+  function escapeHtml(text) {
+    return text
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+  }
+
+  function linkLabel(url) {
+    const clean = url.replace(/^https?:\/\//, "").replace(/^www\./, "");
+    if (clean.includes("linkedin.com")) return "linkedin";
+    if (clean.includes("t.me/humoyun_com")) return "telegram";
+    if (clean.includes("t.me/naseeb_edu")) return "naseeb";
+    if (clean.includes("humoyun.com")) return "humoyun.com";
+    if (clean.includes("youtube.com")) return "youtube";
+    return clean.replace(/\/$/, "");
+  }
+
+  function renderText(text) {
+    let html = escapeHtml(text);
+    html = html.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+|mailto:[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+    html = html.replace(/(https?:\/\/[^\s<),]+)/g, (match) => {
+      const trailing = match.match(/[.,!?;:]+$/);
+      const clean = trailing ? match.slice(0, -trailing[0].length) : match;
+      return `<a href="${clean}" target="_blank" rel="noopener">${linkLabel(clean)}</a>${trailing ? trailing[0] : ""}`;
+    });
+    html = html.replace(/([a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,})/gi, '<a href="mailto:$1">$1</a>');
+    return html;
+  }
+
+  function nearBottom() {
+    return log.scrollTop + log.clientHeight >= log.scrollHeight - 140;
+  }
+
+  function scrollLog() {
+    log.scrollTop = log.scrollHeight;
+  }
+
+  function addMessage(label, cls, text = "") {
+    const message = document.createElement("div");
+    message.className = `msg ${cls}`;
+    message.innerHTML = `<div class="who">${label}</div><div class="bubble"></div>`;
+    log.appendChild(message);
+    const bubble = message.querySelector(".bubble");
+    if (text) bubble.textContent = text;
+    scrollLog();
+    return bubble;
+  }
+
+  function fitInput() {
+    input.style.height = "auto";
+    input.style.height = Math.min(input.scrollHeight, 150) + "px";
+    input.style.overflowY = input.scrollHeight > 150 ? "auto" : "hidden";
+  }
+
+  input.addEventListener("input", fitInput);
+  input.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      form.requestSubmit();
+    }
+  });
+
+  chips.addEventListener("click", (event) => {
+    if (busy || !event.target.classList.contains("chip")) return;
+    input.value = event.target.textContent;
+    fitInput();
+    form.requestSubmit();
+  });
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const text = input.value.trim();
+    if (!text || busy) return;
+
+    busy = true;
+    send.disabled = true;
+    welcome.style.display = "none";
+    addMessage("you", "you", text);
+    history.push({ role: "user", content: text });
+    input.value = "";
+    fitInput();
+
+    const bubble = addMessage("humoyun", "bot");
+    bubble.innerHTML = '<span class="cursor"></span>';
+    let accumulated = "";
+
+    try {
+      const response = await fetch("/api/humoyungpt", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ messages: history })
+      });
+
+      if (!response.ok || !response.body) {
+        let error = "something glitched on my side. try again in a second.";
+        try {
+          const data = await response.json();
+          if (data.error) error = data.error;
+        } catch {}
+        bubble.textContent = error;
+        history.pop();
+        return;
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        const stick = nearBottom();
+        accumulated += decoder.decode(value, { stream: true });
+        bubble.innerHTML = renderText(accumulated) + '<span class="cursor"></span>';
+        if (stick) scrollLog();
+      }
+
+      bubble.innerHTML = renderText(accumulated || "(no response)");
+      if (accumulated) history.push({ role: "assistant", content: accumulated });
+    } catch {
+      bubble.textContent = "network hiccup. try again.";
+      history.pop();
+    } finally {
+      busy = false;
+      send.disabled = false;
+      input.focus();
+    }
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+.DS_Store
+.env
+.netlify
+.playwright-cli
+node_modules
+dist
+work
+output
+deno.lock

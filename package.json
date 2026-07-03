@@ -1,0 +1,9 @@
+{
+  "name": "humoyungpt",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "netlify dev",
+    "check": "node --check netlify/functions/humoyungpt.mjs"
+  }
+}
