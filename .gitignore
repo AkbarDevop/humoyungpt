@@ -7,3 +7,4 @@ dist
 work
 output
 deno.lock
+data/.cache

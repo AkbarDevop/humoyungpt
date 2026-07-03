@@ -4,6 +4,10 @@
   "type": "module",
   "scripts": {
     "dev": "netlify dev",
-    "check": "node --check netlify/functions/humoyungpt.mjs"
+    "fetch:youtube": "node scripts/fetch-youtube-sources.mjs",
+    "summarize:telegram-videos": "node scripts/summarize-telegram-videos.mjs",
+    "summarize:youtube": "node scripts/summarize-youtube-sources.mjs --with-audio",
+    "build:corpus": "node scripts/build-corpus.mjs",
+    "check": "node --check netlify/functions/humoyungpt.mjs && node --check scripts/fetch-youtube-sources.mjs && node --check scripts/summarize-telegram-videos.mjs && node --check scripts/summarize-youtube-sources.mjs && node --check scripts/build-corpus.mjs"
   }
 }

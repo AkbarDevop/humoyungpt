@@ -1,6 +1,8 @@
 import CORPUS from "./humoyun-corpus.json" with { type: "json" };
 
-const MODEL = "gemini-2.5-flash";
+const MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash-lite";
+const EMBED_MODEL = "gemini-embedding-001";
+const EMBED_DIM = 768;
 const MAX_HISTORY = 14;
 const MAX_CHARS_PER_MSG = 1800;
 const MAX_OUTPUT_TOKENS = 1100;
@@ -46,6 +48,14 @@ privacy and accuracy:
 - if you do not know, say you do not know from public context.`;
 
 const CHUNKS = Array.isArray(CORPUS?.chunks) ? CORPUS.chunks : [];
+const VECTOR_CHUNKS = CHUNKS
+  .map((chunk) => {
+    const embedding = Array.isArray(chunk.embedding) ? chunk.embedding : null;
+    if (!embedding?.length) return null;
+    const norm = Math.sqrt(embedding.reduce((sum, value) => sum + value * value, 0));
+    return norm > 0 ? { chunk, embedding, norm } : null;
+  })
+  .filter(Boolean);
 const rate = new Map();
 
 function tokenize(text) {
@@ -58,7 +68,7 @@ function tokenize(text) {
     .filter((w) => w.length > 2 && !STOP.has(w));
 }
 
-function retrieve(query) {
+function retrieveLexical(query) {
   const qTokens = tokenize(query);
   if (!qTokens.length) return [];
   const q = new Map();
@@ -82,6 +92,70 @@ function retrieve(query) {
     .filter((chunk) => chunk.score > 0)
     .sort((a, b) => b.score - a.score);
   return scored.slice(0, TOP_K);
+}
+
+async function retrieve(query, apiKey) {
+  const lexical = retrieveLexical(query);
+  const vector = await retrieveVector(query, apiKey);
+  if (!vector.length) return lexical;
+
+  const merged = new Map();
+  for (const result of vector) {
+    merged.set(result.id || `${result.source}:${result.text}`, result);
+  }
+  for (const result of lexical) {
+    const key = result.id || `${result.source}:${result.text}`;
+    if (!merged.has(key)) merged.set(key, { ...result, lexicalOnly: true });
+  }
+  return [...merged.values()].slice(0, TOP_K);
+}
+
+async function retrieveVector(query, apiKey) {
+  if (!VECTOR_CHUNKS.length) return [];
+  const queryEmbedding = await embedQuery(query, apiKey);
+  if (!queryEmbedding?.length) return [];
+  const queryNorm = Math.sqrt(queryEmbedding.reduce((sum, value) => sum + value * value, 0));
+  if (!queryNorm) return [];
+
+  const scored = VECTOR_CHUNKS
+    .map(({ chunk, embedding, norm }) => {
+      let dot = 0;
+      const length = Math.min(queryEmbedding.length, embedding.length);
+      for (let index = 0; index < length; index += 1) {
+        dot += queryEmbedding[index] * embedding[index];
+      }
+      return { ...chunk, score: dot / (queryNorm * norm) };
+    })
+    .sort((a, b) => b.score - a.score);
+
+  const confident = scored.filter((chunk) => chunk.score >= 0.24).slice(0, TOP_K);
+  return confident.length ? confident : scored.slice(0, Math.min(4, TOP_K));
+}
+
+async function embedQuery(query, apiKey) {
+  try {
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${EMBED_MODEL}:embedContent`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "x-goog-api-key": apiKey,
+      },
+      body: JSON.stringify({
+        content: { parts: [{ text: String(query || "").slice(0, MAX_CHARS_PER_MSG) }] },
+        taskType: "RETRIEVAL_QUERY",
+        outputDimensionality: EMBED_DIM,
+      }),
+    });
+    if (!res.ok) {
+      await res.text().catch(() => "");
+      return null;
+    }
+    const data = await res.json();
+    const values = data?.embedding?.values;
+    return Array.isArray(values) ? values : null;
+  } catch {
+    return null;
+  }
 }
 
 function limited(ip) {
@@ -154,7 +228,7 @@ export default async (req) => {
   }
 
   const lastUser = contents.at(-1).parts[0].text;
-  const notes = retrieve(lastUser);
+  const notes = await retrieve(lastUser, apiKey);
   let systemText = SYSTEM_PROMPT;
   if (notes.length) {
     systemText += "\n\npublic context relevant to this question:\n" +

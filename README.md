@@ -14,6 +14,21 @@ GEMINI_API_KEY=your_key netlify dev
 
 Then open the printed localhost URL.
 
+## Refresh the RAG corpus
+
+The deployed function imports `netlify/functions/humoyun-corpus.json`, which is built from public seed facts, Telegram posts, Telegram video-note summaries, YouTube metadata/captions, and Gemini embeddings.
+
+```bash
+export GEMINI_API_KEY=your_key
+export HUMOYUN_CONTEXT_DIR=/absolute/path/to/humoyun_context
+npm run fetch:youtube
+npm run summarize:telegram-videos
+npm run summarize:youtube
+npm run build:corpus
+```
+
+Raw YouTube captions/audio are cached under `data/.cache/` and are intentionally ignored by git. Telegram MP4s are also kept outside the repo. The committed data files are compact public summaries/manifests plus the embedded corpus.
+
 ## Deploy
 
 ```bash
@@ -31,4 +46,4 @@ Sources used for the first corpus:
 - https://t.me/s/elyurtumidifoundation?before=11418
 - https://portal.bloombergforeducation.com/certificates/JJnawfhBbKt7sQMKQuosSjpj
 
-The Telegram archive included many short video-note URLs. A small local Whisper pass was too noisy to trust, so this build uses reliable public text, captions, profile data, and media metadata instead of pretending to have clean video transcripts.
+The Telegram archive included many short video-note URLs. A local Whisper pass was too noisy to trust, so the build uses Gemini multimodal summaries for downloaded public Telegram MP4s, YouTube captions/metadata where available, profile data, and public Telegram text. If API quota blocks a video summarization run, rerun the relevant script later; errored summaries are skipped by the corpus builder.
