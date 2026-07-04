@@ -1,49 +1,87 @@
-# HumoyunGPT
+# Welcome to your Lovable project
 
-HumoyunGPT is a small Netlify app that lets people chat with an AI version of Khumoyun Nasipkulov, grounded in public context from his portfolio, Telegram channel, public education posts, and public media mentions.
+## Project info
 
-Live: https://humoyungpt.netlify.app
+**URL**: https://lovable.dev/projects/83ec8261-0842-4259-a974-35be57e677b5
 
-The app intentionally keeps the API key out of source control. Set `GEMINI_API_KEY` in Netlify or in a local `.env` file.
+## HumoyunGPT integration
 
-## Run locally
+This version adds a new page at `/humoyungpt` and a Netlify serverless endpoint at `/api/humoyungpt`.
 
-```bash
-GEMINI_API_KEY=your_key netlify dev
+Before deploying, set this environment variable in Netlify:
+
+```sh
+GEMINI_API_KEY=your_key
 ```
 
-Then open the printed localhost URL.
+The homepage navigation and hero now include a HumoyunGPT link. The page uses the same Lovable/Shadcn/Tailwind design system as the rest of the website.
 
-## Refresh the RAG corpus
+## How can I edit this code?
 
-The deployed function imports `netlify/functions/humoyun-corpus.json`, which is built from public seed facts, Telegram posts, Telegram video-note summaries, YouTube metadata/captions, and Gemini embeddings.
+There are several ways of editing your application.
 
-```bash
-export GEMINI_API_KEY=your_key
-export HUMOYUN_CONTEXT_DIR=/absolute/path/to/humoyun_context
-npm run fetch:youtube
-npm run summarize:telegram-videos
-npm run summarize:youtube
-npm run build:corpus
+**Use Lovable**
+
+Simply visit the [Lovable Project](https://lovable.dev/projects/83ec8261-0842-4259-a974-35be57e677b5) and start prompting.
+
+Changes made via Lovable will be committed automatically to this repo.
+
+**Use your preferred IDE**
+
+If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+
+The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+
+Follow these steps:
+
+```sh
+# Step 1: Clone the repository using the project's Git URL.
+git clone <YOUR_GIT_URL>
+
+# Step 2: Navigate to the project directory.
+cd <YOUR_PROJECT_NAME>
+
+# Step 3: Install the necessary dependencies.
+npm i
+
+# Step 4: Start the development server with auto-reloading and an instant preview.
+npm run dev
 ```
 
-Raw YouTube captions/audio are cached under `data/.cache/` and are intentionally ignored by git. Telegram MP4s are also kept outside the repo. The committed data files are compact public summaries/manifests plus the embedded corpus.
+**Edit a file directly in GitHub**
 
-## Deploy
+- Navigate to the desired file(s).
+- Click the "Edit" button (pencil icon) at the top right of the file view.
+- Make your changes and commit the changes.
 
-```bash
-netlify deploy --prod
-```
+**Use GitHub Codespaces**
 
-## Data notes
+- Navigate to the main page of your repository.
+- Click on the "Code" button (green button) near the top right.
+- Select the "Codespaces" tab.
+- Click on "New codespace" to launch a new Codespace environment.
+- Edit files directly within the Codespace and commit and push your changes once you're done.
 
-Sources used for the first corpus:
+## What technologies are used for this project?
 
-- https://www.humoyun.com/
-- https://t.me/s/humoyun_com
-- https://telemetr.io/en/channels/1577506188-humoyundotcom
-- https://www.youtube.com/watch?v=b1-1g-w-v_A
-- https://t.me/s/elyurtumidifoundation?before=11418
-- https://portal.bloombergforeducation.com/certificates/JJnawfhBbKt7sQMKQuosSjpj
+This project is built with:
 
-The Telegram archive included many short video-note URLs. A local Whisper pass was too noisy to trust, so the build uses Gemini multimodal summaries for downloaded public Telegram MP4s, YouTube captions/metadata where available, profile data, and public Telegram text. If API quota blocks a video summarization run, rerun the relevant script later; errored summaries are skipped by the corpus builder.
+- Vite
+- TypeScript
+- React
+- shadcn-ui
+- Tailwind CSS
+
+## How can I deploy this project?
+
+Simply open [Lovable](https://lovable.dev/projects/83ec8261-0842-4259-a974-35be57e677b5) and click on Share -> Publish.
+
+If deploying through Netlify, this repo already includes `netlify.toml` with the build settings, SPA fallback, and HumoyunGPT function route.
+
+## Can I connect a custom domain to my Lovable project?
+
+Yes, you can!
+
+To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+
+Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
